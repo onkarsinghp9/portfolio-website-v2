@@ -1,0 +1,543 @@
+body {
+   font-family: 'Arial', sans-serif;
+   margin: 0;
+   padding: 0;
+   background-color: #282c35; /* Dark background color */
+   color: #fff; /* Text color */
+}
+
+#background {
+   position: fixed; /* Fixed position to cover the whole viewport */
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   opacity: 0;
+   transition: opacity 2s ease-in-out; /* Fade-in effect */
+   background-size: cover;
+   background-repeat: no-repeat;
+   background-position: center;
+   z-index: -1; /* Ensures the background is behind other content */
+}
+
+.loader-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.loader-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+header {
+   background-color: #1f2229; /* Slightly darker header color */
+   text-align: center;
+   padding: 1em 0;
+   margin-bottom: 0px;
+}
+
+.name {
+   margin-bottom: 5px;
+}
+
+.phone {
+   margin-bottom: 5px;
+}
+
+h1 {
+   display: inline-block;
+   font-size: 3em;
+   color: #61dafb; /* Bright blue color for the first letter */
+}
+
+.small-letters {
+   font-size: 0.8em;
+   color: #61dafb; /* Same color as the first letter */
+}
+
+section {
+   max-width: 800px;
+   margin: 20px auto;
+   padding: 20px;
+   background-color: #363b47; /* Slightly darker content background color */
+   border-radius: 8px;
+   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+/* Add these styles at the end of your existing styles */
+
+
+
+.menu-btn {
+   font-size: 2em;
+   cursor: pointer;
+   position: absolute;
+   top: 20px;
+   right: 20px;
+   z-index: 2; /* Ensure the menu button is above the menu */
+   transition: color 1s ease-in-out;
+}
+
+
+
+.menu {
+   display: none;
+   position: fixed;
+   top: 0;
+   right: 0;
+   width: 60%;
+   max-width: 300px;
+   background-color: #1f2229;
+   padding: 20px;
+   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+   z-index: 1;
+   transition: transform 1s ease-in-out; 
+}
+
+
+
+.menu ul {
+   list-style: none;
+   padding: 0;
+}
+
+.menu li {
+   margin-bottom: 10px;
+   font-size: 1.5em;
+}
+
+.menu a {
+   color: #61dafb;
+   text-decoration: none;
+}
+
+/* ... Your existing styles ... */
+/* ... Your existing styles ... */
+
+.theme-button {
+   cursor: pointer;
+   padding: 10px;
+   margin-top: 20px;
+   background-color: #3498db; /* Default theme color */
+   color: #fff;
+   border: none;
+   border-radius: 5px;
+   transition: background-color 0.5s ease-in-out; /* Added transition property */
+}
+
+
+
+/* ... Your existing styles ... */
+
+/* ... Your existing styles ... */
+
+.dynamic-content {
+   max-width: 800px;
+   margin: 20px auto;
+   padding: 20px;
+   background-color: #363b47;
+   border-radius: 8px;
+   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+   overflow: hidden;
+}
+
+/* ... Your existing styles ... */
+
+/* ... Your existing styles ... */
+
+.carousel-container {
+   position: relative;
+   overflow: hidden;
+}
+
+.carousel-dots {
+   position: relative;
+   bottom: 10px;
+   left: 50%;
+   transform: translateX(-50%);
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.dot {
+   width: 10px;
+   height: 10px;
+   border-radius: 50%;
+   background-color: #555;
+   margin: 0 2vw;
+   cursor: pointer;
+}
+
+.active-dot {
+   background-color: #ccc;
+}
+
+/* ... Your existing styles ... */
+
+
+.carousel {
+   display: flex;
+   gap: 10vw; /* Set the gap to 3vw */
+   transition: transform 1s ease-in-out;
+}
+
+.carousel img {
+   
+   width: calc(100% - 10vw); /* Adjust the width and gap */
+   box-shadow: 10px 10px 20px rgba(255, 255, 255, 0.8);
+}
+/* ... Your existing styles ... */
+
+
+/* ... Your existing styles ... */
+
+ul {
+   list-style: none;
+   padding: 0;
+}
+
+li {
+   margin-bottom: 10px;
+   font-size: 1.2em; /* Larger font size for list items */
+}
+
+/* Add more styles as needed */
+
+
+
+/* ... Your existing styles ... */
+
+.section .profile-container {
+   display: flex;
+   align-items: center;
+   justify-content: space-around;
+   margin-top: 20px;
+}
+
+/* ... Your existing styles ... */
+/* Add this to your existing CSS styles */
+
+.section #about-me {
+   background: linear-gradient(45deg, #3498db, #2ecc71);
+   -webkit-background-clip: text;
+   color: transparent;
+   font-size: 20px;
+}
+
+/* Adjust the gradient colors and angle as per your preference */
+
+/* ... Your existing styles ... */
+
+.section .profile-image {
+   width: 150px;
+   height: 150px;
+   background-color: #3498db;
+   border-radius: 50%;
+   background-size: cover;
+   background-position: center;
+   overflow: hidden;
+
+   /* Add any additional styling for the profile image */
+}
+
+#about-text {
+   background: linear-gradient(45deg, #3498db, #2ecc71);
+   -webkit-background-clip: text;
+   color: transparent;
+   font-size: 20px;
+}
+
+/* ... Your existing styles ... */
+
+
+.section .profile-text {
+   max-width: 600px;
+   text-align: justify;
+   padding: 20px;
+}
+
+/* ... Your existing styles ... */
+
+.section #certifications {
+   background-color: #f9f9f9;
+   padding: 40px 0;
+}
+
+.section.certifications-section.active #certifications {
+   opacity: 1;
+}
+
+.section .certifications-container {
+   display: flex;
+   justify-content: space-around;
+   flex-wrap: wrap;
+}
+
+/* ... Your existing styles ... */
+
+.section .certification {
+   width: 30%;
+   padding: 20px;
+   margin: 10px;
+   border: 1px solid #ddd;
+   border-radius: 8px;
+   background-color: #fff;
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+   text-align: center;
+   color: #333; /* Adjust text color to make it visible */
+}
+
+.section .certification:hover {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+
+.section .certification img {
+   width: 50px; /* Adjust the size of the logo */
+   margin-bottom: 10px;
+}
+
+
+
+.section #skills {
+   background-color: #f9f9f9;
+   padding: 40px 0;
+   opacity: 0;
+   transition: opacity 0.6s ease-in-out;
+}
+
+.section.skills-section.active #skills {
+   opacity: 1;
+}
+
+.section .skills-container .skill h3 {
+   font-size: 18px;
+   margin-bottom: 10px;
+   color: #3498db;
+   white-space: nowrap; /* Prevent line breaks */
+   overflow: hidden; /* Hide overflowing content */
+   border-right: 2px solid #3498db; /* Create a blinking cursor effect */
+   animation: typing 1s steps(20, end) forwards;
+}
+
+.section .skills-container {
+   display: flex;
+   justify-content: space-around;
+   flex-wrap: wrap;
+}
+
+.section .skill {
+   width: 30%;
+   padding: 20px;
+   margin: 10px;
+   border: 1px solid #ddd;
+   border-radius: 8px;
+   background-color: #fff;
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+   transform-origin: center;
+   transition: transform 0.3s ease-in-out;
+   animation: fadeInUp 1s ease-out;
+}
+
+.section .skill:hover {
+   transform: scale(1.05);
+}
+
+.section .skill h3 {
+   font-size: 18px;
+   margin-bottom: 10px;
+   color: #3498db;
+}
+
+.section .skill ul {
+   list-style: none;
+   padding: 0;
+}
+
+.section .skill li {
+   margin-bottom: 5px;
+   color: #555;
+}
+
+/* Animation Keyframes */
+@keyframes fadeInUp {
+   from {
+      opacity: 0;
+      transform: translateY(20px);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+/* New styles for a timeline-based experience section */
+
+
+.experience-entry {
+    position: relative;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #27ae60;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.time {
+    position: absolute;
+    top: 50%;
+    left: -50px;
+    transform: translateY(-50%);
+    background-color: #fff;
+    color: #27ae60;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.position {
+    font-size: 1.5em;
+    font-weight: bold;
+    position: relative; /* Set to relative */
+    left: 28%; /* Adjust the value as needed */
+}
+
+.company {
+    font-style: italic;
+    position: relative; /* Set to relative */
+    left: 28%; /* Adjust the value as needed */
+}
+
+.year {
+    font-weight: bold;
+    position: relative; /* Set to relative */
+    left: 28%; /* Adjust the value as needed */
+}
+
+/*comment section*/
+.contact-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.form-container {
+        background-color: #121212;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        color: #e0e0e0;
+        flex: 1 1 300px;
+        margin-top: 20px;
+    }
+
+.linkedin-container {
+    flex-shrink: 0;  /* Prevent shrinking, but allow form to take space */
+    max-width: 150px; /* Control width of LinkedIn badge container */
+}
+
+/* Handling layout if LinkedIn badge is missing */
+.linkedin-container:empty {
+    display: none;  /* If LinkedIn badge doesn't load, hide the container */
+}
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        font-size: 1.1em;
+        margin-bottom: 5px;
+        color: #b0b0b0;
+    }
+
+    textarea, input {
+        width: 95%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #2e2e2e;
+        color: #e0e0e0;
+        font-size: 1em;
+    }
+
+    textarea:focus, input:focus {
+        outline: none;
+        border: 2px solid #6200ea;
+        box-shadow: 0 0 5px #6200ea;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        background-color: #6200ea;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.2em;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #3700b3;
+    }
+
+    .contact-section {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .contact-info {
+        flex: 1 1 300px;
+        margin-right: 20px;
+    }
