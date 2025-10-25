@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bus Tracker with Multiple Routes</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://rawcdn.githack.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js"></script>
+
+<script>
+const map = L.map('map').setView([60.72781, -135.0584], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+// List of route IDs you want to track
+const routes = [48, 46, 49, 53, 52, 47, 50];
+
+// Store markers for each route
+const busMarkers = {};
+
+const routeNumberMap = {
+  48: 201,
+  46: 101,
+  49: 202,
+  53: 404,
+  52: 402,
+  47: 000,
+  50: 000
+};
+
+async function fetchBusData() {
+  const url = "https://whitehorse.transloc.com/Services/JSONPRelay.svc/GetMapVehiclePoints?ApiKey=8882812681";
+  try {
+    const response = await fetch(url);
+    const text = await response.text();
+    const buses = JSON.parse(text);
+
+    // Add a new RouteNumber property based on RouteID
+    buses.forEach(bus => {
+      if (routeNumberMap[bus.RouteID] !== undefined) {
+        bus.RouteNumber = routeNumberMap[bus.RouteID];
+      }
+    });
+
+    return buses;
+  } catch (err) {
+    console.error("Error fetching or parsing bus data:", err);
+    return [];
+  }
+}
+
+// Function to create a bus icon with number above the bus
+function createBusIcon(busNumber) {
+  return L.divIcon({
+    html: `
+      <div style="position: relative; text-align: center;">
+        <div style="
+          position: absolute;
+          top: 0px;  /* number above the bus */
+          left: 50%;
+          transform: translateX(-50%);
+          font-weight: bold;
+          font-size: 20px;
+          pointer-events: none;
+        ">${busNumber}</div>
+        <div style="font-size:32px;">🚌</div>
+      </div>
+    `,
+    className: '',
+    iconSize: [42, 42],
+    iconAnchor: [16, 16]
+  });
+}
+
+function createBusPopup(bus) {
+  let html = `<div style="min-width:200px">`;
+  for (const key in bus) {
+    html += `<b>${key}:</b> ${bus[key]}<br>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+async function updateBusPositions() {
+  const buses = await fetchBusData();
+  
+  routes.forEach(routeID => {
+    const bus = buses.find(b => b.RouteID === routeID);
+    if (!bus) return;
+
+    const { Latitude, Longitude, Name, Heading, VehicleID, RouteNumber } = bus;
+
+if (!busMarkers[RouteNumber]) {
+  busMarkers[RouteNumber] = L.marker([Latitude, Longitude], { 
+    icon: createBusIcon(RouteNumber), 
+    rotationAngle: Heading + 90 
+  })
+  .addTo(map)
+  .bindPopup(createBusPopup(bus));
+} else {
+  busMarkers[RouteNumber].setLatLng([Latitude, Longitude]);
+  busMarkers[RouteNumber].setRotationAngle(Heading + 90);
+  busMarkers[RouteNumber].setIcon(createBusIcon(RouteNumber));
+  busMarkers[RouteNumber].getPopup().setContent(createBusPopup(bus));
+}
+  });
+}
+
+// Update every 5 seconds
+setInterval(updateBusPositions, 1000);
+
+// Initial load
+updateBusPositions();
+</script>
+
+</body>
+</html>
