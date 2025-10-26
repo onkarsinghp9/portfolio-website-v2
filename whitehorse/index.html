@@ -1,134 +1,193 @@
 <!DOCTYPE html>
-
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="styles1.css">
-  <title>Bus Tracker with Multiple Routes</title>
+<html>
+<head>
+  <title>Whitehorse Live Bus Tracker</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
+    body, html { margin: 0; padding: 0; height: 100%; }
     #map { height: 100vh; }
+
+    .map-controls {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.7);
+      padding: 6px 10px;
+      border-radius: 12px;
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .map-controls button {
+      border: none;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 14px;
+    }
+
+    .map-controls button.active {
+      background: rgba(0,150,255,0.7);
+    }
+
+    .map-controls button:hover {
+      background: rgba(0,0,0,0.7);
+    }
   </style>
 </head>
 <body>
+  <div class="map-controls">
+    <button id="toggle-satellite">🛰️ Satellite</button>
+    <button id="toggle-traffic">🚗 Traffic</button>
+    <button id="toggle-routes">🗺️ Routes</button>
+    <button id="toggle-stops">📍 Stops</button>
+  </div>
+  <div id="map"></div>
 
-<div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
+  <script src="https://rawcdn.githack.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js"></script>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://rawcdn.githack.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js"></script>
+  <script>
+    const map = L.map('map').setView([60.72781, -135.0584], 13);
 
-<script>
-const map = L.map('map').setView([60.72781, -135.0584], 13);
+    // Base map
+    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
-}).addTo(map);
-
-// List of route IDs you want to track
-const routes = [48, 46, 49, 53, 52, 47, 50];
-
-// Store markers for each route
-const busMarkers = {};
-
-const routeNumberMap = {
-  48: 201,
-  46: 101,
-  49: 202,
-  53: 404,
-  52: 402,
-  47: 000,
-  50: 000
-};
-
-async function fetchBusData() {
-  const url = "https://whitehorse.transloc.com/Services/JSONPRelay.svc/GetMapVehiclePoints?ApiKey=8882812681";
-  try {
-    const response = await fetch(url);
-    const text = await response.text();
-    const buses = JSON.parse(text);
-
-    // Add a new RouteNumber property based on RouteID
-    buses.forEach(bus => {
-      if (routeNumberMap[bus.RouteID] !== undefined) {
-        bus.RouteNumber = routeNumberMap[bus.RouteID];
-      }
+    // Satellite and traffic overlays
+    const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains:['mt0','mt1','mt2','mt3'],
+      attribution: '© Google'
     });
 
-    return buses;
-  } catch (err) {
-    console.error("Error fetching or parsing bus data:", err);
-    return [];
-  }
-}
+    const trafficLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=h,traffic&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains:['mt0','mt1','mt2','mt3'],
+      attribution: 'Traffic © Google'
+    });
 
-// Function to create a bus icon with number above the bus
-function createBusIcon(busNumber) {
-  return L.divIcon({
-    html: `
-      <div style="position: relative; text-align: center;">
-        <div style="
-          position: absolute;
-          top: 0px;  /* number above the bus */
-          left: 50%;
-          transform: translateX(-50%);
-          font-weight: bold;
-          font-size: 20px;
-          pointer-events: none;
-        ">${busNumber}</div>
-        <div style="font-size:32px;">🚌</div>
-      </div>
-    `,
-    className: '',
-    iconSize: [42, 42],
-    iconAnchor: [16, 16]
-  });
-}
+    // Whitehorse Open Data KMLs
+    const proxy = "https://corsproxy.io/?";
+    const routesURL = proxy + "https://data.whitehorse.ca/Transportation/Transit_Bus_Routes_2011.kml";
+    const stopsURL  = proxy + "https://data.whitehorse.ca/Transportation/Transit_Bus_Stops_2011.kml";
 
-function createBusPopup(bus) {
-  let html = `<div style="min-width:200px">`;
-  for (const key in bus) {
-    html += `<b>${key}:</b> ${bus[key]}<br>`;
-  }
-  html += `</div>`;
-  return html;
-}
 
-async function updateBusPositions() {
-  const buses = await fetchBusData();
-  
-  routes.forEach(routeID => {
-    const bus = buses.find(b => b.RouteID === routeID);
-    if (!bus) return;
+    const routeLayer = omnivore.kml(routesURL, null, L.geoJSON(null, {
+      style: { color: 'blue', weight: 4, opacity: 0.8 }
+    }));
 
-    const { Latitude, Longitude, Name, Heading, VehicleID, RouteNumber } = bus;
+    const stopsLayer = omnivore.kml(stopsURL, null, L.geoJSON(null, {
+      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+        radius: 5,
+        fillColor: 'yellow',
+        color: 'black',
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.9
+      }).bindPopup(feature.properties.name || 'Bus Stop')
+    }));
 
-if (!busMarkers[RouteNumber]) {
-  busMarkers[RouteNumber] = L.marker([Latitude, Longitude], { 
-    icon: createBusIcon(RouteNumber), 
-    rotationAngle: Heading + 90 
-  })
-  .addTo(map)
-  .bindPopup(createBusPopup(bus));
-} else {
-  busMarkers[RouteNumber].setLatLng([Latitude, Longitude]);
-  busMarkers[RouteNumber].setRotationAngle(Heading + 90);
-  busMarkers[RouteNumber].setIcon(createBusIcon(RouteNumber));
-  busMarkers[RouteNumber].getPopup().setContent(createBusPopup(bus));
-}
-  });
-}
+    // Live bus tracking setup
+    const routes = [48, 46, 49, 53, 52, 47, 50];
+    const busMarkers = {};
+    const routeNumberMap = { 48: 201, 46: 101, 49: 202, 53: 404, 52: 402, 47: 0, 50: 0 };
 
-// Update every 5 seconds
-setInterval(updateBusPositions, 1000);
+    async function fetchBusData() {
+      const url = "https://whitehorse.transloc.com/Services/JSONPRelay.svc/GetMapVehiclePoints?ApiKey=8882812681";
+      try {
+        const response = await fetch(url);
+        const text = await response.text();
+        const buses = JSON.parse(text);
+        buses.forEach(bus => {
+          if (routeNumberMap[bus.RouteID] !== undefined) {
+            bus.RouteNumber = routeNumberMap[bus.RouteID];
+          }
+        });
+        return buses;
+      } catch (err) {
+        console.error("Error fetching or parsing bus data:", err);
+        return [];
+      }
+    }
 
-// Initial load
-updateBusPositions();
-</script>
+    function createBusIcon(busNumber) {
+      return L.divIcon({
+        html: `<div style="position: relative; text-align: center;">
+                 <div style="position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+                     font-weight: bold; font-size: 16px; color: #000; text-shadow: 0 0 2px #fff;">
+                     ${busNumber}</div>
+                 <div style="font-size: 28px;">🚌</div>
+               </div>`,
+        className: '',
+        iconSize: [42, 42],
+        iconAnchor: [21, 21]
+      });
+    }
 
+    function createBusPopup(bus) {
+      let html = `<div style="min-width:200px">`;
+      for (const key in bus) {
+        html += `<b>${key}:</b> ${bus[key]}<br>`;
+      }
+      html += `</div>`;
+      return html;
+    }
+
+    async function updateBusPositions() {
+      const buses = await fetchBusData();
+      routes.forEach(routeID => {
+        const bus = buses.find(b => b.RouteID === routeID);
+        if (!bus) return;
+        const { Latitude, Longitude, Heading, RouteNumber } = bus;
+        if (!busMarkers[RouteNumber]) {
+          busMarkers[RouteNumber] = L.marker([Latitude, Longitude], {
+            icon: createBusIcon(RouteNumber),
+            rotationAngle: Heading + 90
+          }).addTo(map).bindPopup(createBusPopup(bus));
+        } else {
+          busMarkers[RouteNumber].setLatLng([Latitude, Longitude]);
+          busMarkers[RouteNumber].setRotationAngle(Heading + 90);
+          busMarkers[RouteNumber].setIcon(createBusIcon(RouteNumber));
+          busMarkers[RouteNumber].getPopup().setContent(createBusPopup(bus));
+        }
+      });
+    }
+
+    setInterval(updateBusPositions, 5000);
+    updateBusPositions();
+
+    // Toggle helper
+    const toggle = (btn, layer) => {
+      const el = document.getElementById(btn);
+      el.addEventListener('click', () => {
+        if (map.hasLayer(layer)) {
+          map.removeLayer(layer);
+          el.classList.remove('active');
+        } else {
+          map.addLayer(layer);
+          el.classList.add('active');
+        }
+      });
+    };
+
+    // Attach toggles
+    toggle('toggle-satellite', satelliteLayer);
+    toggle('toggle-traffic', trafficLayer);
+    toggle('toggle-routes', routeLayer);
+    toggle('toggle-stops', stopsLayer);
+  </script>
 </body>
 </html>
